@@ -1,0 +1,2 @@
+Book 1|Author 1|isnb1|true|None
+Book 2|Author 2|isnb2|true|None
