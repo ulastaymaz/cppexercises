@@ -7,11 +7,11 @@
 #include <algorithm>
 #include <stdexcept>
 #include <fstream>
+#include <chrono>
 #include "matrix.cpp"
 #include "utility_functions.cpp"
 using namespace std;
 
-#define RL_BUFSIZE 1024
 
 void LU_decomp(Matrix A, Matrix &L, Matrix &U){
     ///Not finished
@@ -84,6 +84,8 @@ void QR_decomp(Matrix A, Matrix &Q, Matrix &R)
 {
     // Tested for some matrices, should test for extreme cases
     /////////////////////////////////////
+    // Doesn't produce good resulst for large matrices (N over 100)
+    /////////////////////////////////////
     // Initialize u vectors
     vector<vector<float>> u(A.row, vector<float>(A.col, 0.0f));
 
@@ -142,30 +144,45 @@ void QR_decomp(Matrix A, Matrix &Q, Matrix &R)
 }
 
 
+Matrix create_random_matrix(int row1, int col1) {
+    Matrix output(row1, col1);
+    float HI = 10.0f;
+    float LO = -10.0f;
+
+    for(int i = 0; i < row1 * col1; i++)
+    {
+        output.m[i] = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+    }
+    //cout<<output;
+    return output;
+    
+}
+
+
 int main(int argc, char **argv){
 
-    string name = "matrix_a.txt";
-    ifstream readfromfileA(name);
-    if (!readfromfileA) {
-        cerr << "Error opening file" << endl;
-        return EXIT_FAILURE;
+    cout << "#####################" << endl;
+    cout << "QR Decomposition Test" << endl;
+    cout << "#####################" << endl;
+    cout << "In every step, a random matrix created, with inputs between -10.0 and 10.0" << endl;
+    cout << "For error, elementwise difference has taken into account" << endl;
+    cout << "#####################" << endl;
+    for (int i = 0; i < 4; i++)
+    {
+        
+        int temp = pow(10, i);
+        unique_ptr<Matrix> F = make_unique<Matrix>(temp, temp);
+        *F = create_random_matrix(temp, temp);
+        unique_ptr<Matrix> Q1 = make_unique<Matrix>(temp, temp);
+        unique_ptr<Matrix> R1 = make_unique<Matrix>(temp, temp);
+        auto start1 = chrono::high_resolution_clock::now();
+        QR_decomp(*F, *Q1, *R1);
+        auto stop1 = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::microseconds>(stop1 - start1);
+        unique_ptr<Matrix> TEMP_MATRIX = make_unique<Matrix>(temp, temp);
+        *TEMP_MATRIX = *F-(*Q1)*(*R1);
+        cout << "N = 10 ^ " << i << ", Error : " << (*TEMP_MATRIX).sum_of_abs_elem() <<", Time: " << duration.count() << " microseconds" << endl;
     }
-    Matrix A(readfromfileA);
-    
-    readfromfileA.close();
-    ifstream readfromfileB("matrix_b.txt");
-    if (!readfromfileB) {
-        cerr << "Error opening file" << endl;
-        return EXIT_FAILURE;
-    }
-    //readfromfileB.open();
-    Matrix B(readfromfileB);
-    A.print_matrix();
-    Matrix Q(A.row, A.row);
-    Matrix R(A.row, A.col);
-    QR_decomp(A, Q, R);
-    Matrix deneme = A-Q*R;
-
 
     
 }
