@@ -28,8 +28,10 @@ class Matrix{
         bool operator!=(const Matrix  &A) const; // If |a_ij - b_ij| >= EPS = 1e-6, for some i,j, two matrices not equal
         friend std::ostream& operator<<(std::ostream& os, const Matrix &A); // Can be used directly for printing the matrix
         std::vector<float> get_column(int j) const; // Get i^th column of matrix
+        float sum_of_abs_elem() const; // Sum of all elements in absolute value of the matrix, for testing
         Matrix(int row, int col); // Creates a zero matrix with given number of row and column
         Matrix(std::ifstream &readingfromfile); // Reads file for creating a matrix. Should be improved
         Matrix(); // User can use this for adding elements of matrix one-by-one 
-        };
+        ~Matrix();
+    };
     #endif // MATRIX_H, EPS
