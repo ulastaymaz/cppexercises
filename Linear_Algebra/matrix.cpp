@@ -90,7 +90,7 @@ Matrix::Matrix()
         m[i] = temp;
     }
 }
-
+Matrix::~Matrix(){};
 Matrix Matrix::operator+(const Matrix &A) const {
     if(A.row != row || A.col != col){
         cerr<<"Rows and columns numbers must be same!";
@@ -276,4 +276,12 @@ Matrix transpose(Matrix const &A){
         }
     }
     return output;
+}
+
+float Matrix::sum_of_abs_elem() const{
+    float count = 0.0f;
+    for(auto &v : m){
+        count += abs(v);
+    }
+    return count;
 }
